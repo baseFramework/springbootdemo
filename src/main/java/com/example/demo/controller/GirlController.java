@@ -1,8 +1,13 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.domain.Girl;
+import com.example.demo.repository.GirlRepository;
+import com.example.demo.service.GirlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +31,17 @@ public class GirlController {
 
     /**
      * 添加一个女生
-     * @param cupSize
-     * @param age
+     * @param girl
      * @return
      */
     @PostMapping(value="/addgirl")
-    public Girl girlAdd(@RequestParam("cupSize") String cupSize,
-                          @RequestParam("age") Integer age){
-        Girl girl = new Girl();
-        girl.setAge(age);
-        girl.setCupSize(cupSize);
-
+    public Girl girlAdd(@Valid Girl girl, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            System.out.println(bindingResult.getFieldError().getDefaultMessage());
+            return null;
+        }
+        girl.setAge(girl.getAge());
+        girl.setCupSize(girl.getCupSize());
         return girlRepository.save(girl);
     }
 
