@@ -1,9 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.aspect.HttpAspect;
 import com.example.demo.domain.Girl;
+import com.example.demo.domain.Result;
 import com.example.demo.repository.GirlRepository;
 import com.example.demo.service.GirlService;
+import com.example.demo.utils.ResultUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +42,16 @@ public class GirlController {
      * @return
      */
     @PostMapping(value="/addgirl")
-    public Girl girlAdd(@Valid Girl girl, BindingResult bindingResult){
+    public Result<Girl> girlAdd(@Valid Girl girl, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
-            logger.error(bindingResult.getFieldError().getDefaultMessage());
             return null;
+            //return ResultUtil.error(1,bindingResult.getFieldError().getDefaultMessage());
         }
         girl.setAge(girl.getAge());
         girl.setCupSize(girl.getCupSize());
-        return girlRepository.save(girl);
+        girl.setMoney(girl.getMoney());
+
+        return ResultUtil.success(girlRepository.save(girl));
     }
 
     /**
@@ -58,13 +61,7 @@ public class GirlController {
      */
     @GetMapping(value="/girls/{id}")
     public Girl girlFindOne(@PathVariable("id") Integer id){
-        Girl result = new Girl();
-        Optional<Girl> userById = girlRepository.findById(id);
-        if (userById.isPresent()) {
-            return userById.get();
-        } else {
-            return result;
-        }
+      return girlRepository.findOne(id);
     }
 
     /**
@@ -77,20 +74,22 @@ public class GirlController {
     @PutMapping(value="/girls/{id}")
     public Girl girlUpdate(@PathVariable("id") Integer id,
                            @RequestParam("cupSize") String cupSize,
-                           @RequestParam("age") Integer age
+                           @RequestParam("age") Integer age,
+                              @RequestParam("money") Integer money
                            ){
 
         Girl girl = new Girl();
         girl.setId(id);
         girl.setCupSize(cupSize);
         girl.setAge(age);
+        girl.setMoney(money);
 
         return girlRepository.save(girl);
     }
 
     @DeleteMapping(value="/girls/{id}")
     public void girlDel(@PathVariable("id") Integer id){
-        girlRepository.deleteById(id);
+        girlRepository.delete(id);
     }
 
     //通过年龄查询女生列表
@@ -102,5 +101,10 @@ public class GirlController {
     @PostMapping(value="/girls/two")
     public void girlTwo(){
         girlService.insertTwo();
+    }
+
+    @GetMapping(value="/girls/getAge/{id}")
+    public void getAge(@PathVariable("id") Integer id) throws  Exception{
+        girlService.getAge(id);
     }
 }
