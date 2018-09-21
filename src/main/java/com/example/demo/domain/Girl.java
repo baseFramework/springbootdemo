@@ -46,4 +46,9 @@ public class Girl {
     public String getCupSize() {
         return cupSize;
     }
+
+    @Override
+    public String toString(){
+        return "Girl{" + "id=" + id + ", cupSize='"+ cupSize + '\''  +", age=" + age +'}';
+    }
 }
